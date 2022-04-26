@@ -7,11 +7,16 @@ from youtube_transcript_api import (
     TranscriptsDisabled,
     YouTubeTranscriptApi,
 )
+from youtube_transcript_api.formatters import TextFormatter
 
 from config import settings
 
 # env variables
 YOUTUBE_API_KEY = settings.youtube_v3_api_key
+
+
+# formatter for youtube transcripts
+formatter = TextFormatter()
 
 
 def if_yt_video_exists(video_id: str) -> Tuple:
@@ -54,11 +59,7 @@ def get_subtitles(video_id: str):
     """
     try:
         subtitles = YouTubeTranscriptApi.get_transcript(video_id=video_id)
-        # format reponse object into a paragraph
-        transcript = ""
-        for subtitle in subtitles:
-            transcript += subtitle["text"]
-            transcript += " "
+        transcript = formatter.format_transcript(subtitles).replace("\n", " ")
         return {
             "success": True,
             "message": "Subtiles generated successfully.",
